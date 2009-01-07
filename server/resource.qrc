@@ -1,0 +1,9 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>icons/server-16x16.png</file>
+    <file>icons/server-24x24.png</file>
+    <file>icons/server-32x32.png</file>
+    <file>icons/server-48x48.png</file>
+    <file>icons/server-64x64.png</file>
+</qresource>
+</RCC>

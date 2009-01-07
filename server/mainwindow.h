@@ -17,31 +17,34 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .        *
  **************************************************************************/
 
-#ifndef SERVERDIALOG_H
-#define SERVERDIALOG_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
-#include <QDialog>
-#include "ui_server.h"
+#include "ui_neptune.h"
 
-class QTcpServer;
+#include <QMainWindow>
+#include <QtNetwork/QAbstractSocket>
 
-class ServerDialog : public QDialog
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    ServerDialog(QWidget *parent = 0);
-    ~ServerDialog();
-
-private:
-    Ui::Server server;
-    QTcpServer *m_tcpServer;
+    MainWindow(QWidget *parent = 0);
+    ~MainWindow();
 
 protected slots:
-    void makeServer();
-    void incomingConnection();
+    void slotConnected();
+    void slotDisconnected();
+    void slotError(QAbstractSocket::SocketError);
+    void slotHostFound();
+    // void slotProxyAuthenticationRequired
+    void slotStateChanged(QAbstractSocket::SocketState);
+    void slotTryConnection();
+    void slotRead();
 
-public slots:
-    void setSuggestedAddress(const QString &);
+private:
+    Ui::MainWindow ui;
+    QAbstractSocket *m_socket;
 };
 
-#endif
+#endif 

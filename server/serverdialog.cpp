@@ -20,6 +20,7 @@
 #include "serverdialog.h"
 #include "connectioninfowidget.h"
 
+#include <QSystemTrayIcon>
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QTcpSocket>
@@ -33,7 +34,10 @@ ServerDialog::ServerDialog(QWidget *parent) : QDialog(parent), m_tcpServer(0)
 }
 
 ServerDialog::~ServerDialog()
-{}
+{
+    m_server->removeLockFile();
+    delete m_server;
+}
 
 void ServerDialog::makeServer()
 {
@@ -58,6 +62,14 @@ void ServerDialog::incomingConnection()
 {
     server.textBrowser->append(tr("A new incoming connection estabilished with the server."), ConnectionInfoWidget::Normal);
     m_tcpServer->nextPendingConnection()->write("Welcome!");
+}
+
+void ServerDialog::setServer(NeptuneServer *server)
+{
+    m_server = server;
+
+    QSystemTrayIcon trayIcon(m_server->serverIcon());
+    trayIcon.show();
 }
 
 #include "serverdialog.moc"

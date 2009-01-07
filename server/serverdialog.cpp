@@ -20,6 +20,8 @@
 #include "serverdialog.h"
 #include "connectioninfowidget.h"
 
+#include <QDebug>
+
 #include <QSystemTrayIcon>
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QHostAddress>
@@ -68,8 +70,8 @@ void ServerDialog::setServer(NeptuneServer *server)
 {
     m_server = server;
 
-    QSystemTrayIcon trayIcon(m_server->serverIcon());
-    trayIcon.show();
+    QSystemTrayIcon *trayIcon = new QSystemTrayIcon(m_server->serverIcon(), this);
+    trayIcon->show();
 }
 
 #include "serverdialog.moc"

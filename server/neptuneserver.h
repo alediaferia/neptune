@@ -44,7 +44,7 @@ protected:
 private:
     NeptuneServer(QApplication *application);
     QApplication *app;
-    QString lockerPath;
+    QString m_lockerPath;
 //     QFile *m_locker;
 };
 

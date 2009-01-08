@@ -22,12 +22,14 @@
 
 #include <QDebug>
 
-#include <QSystemTrayIcon>
+#include <QCursor>
+#include <QMenu>
+#include <QAction>
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QTcpSocket>
 
-ServerDialog::ServerDialog(QWidget *parent) : QDialog(parent), m_tcpServer(0)
+ServerDialog::ServerDialog(QWidget *parent) : QDialog(parent), m_tcpServer(0), m_trayIcon(0)
 {
     server.setupUi(this);
     connect (server.okButton, SIGNAL(clicked()), this, SLOT(accept()));
@@ -70,8 +72,32 @@ void ServerDialog::setServer(NeptuneServer *server)
 {
     m_server = server;
 
-    QSystemTrayIcon *trayIcon = new QSystemTrayIcon(m_server->serverIcon(), this);
-    trayIcon->show();
+    buildTray();
+}
+
+void ServerDialog::buildTray()
+{
+    QMenu *trayMenu = new QMenu(this);
+    trayMenu->addSeparator();
+    QAction *exitAction = trayMenu->addAction(tr("Exit"));
+
+    m_trayIcon = new QSystemTrayIcon(m_server->serverIcon(), this);
+    m_trayIcon->setContextMenu(trayMenu);
+    connect (m_trayIcon, SIGNAL(activated( QSystemTrayIcon::ActivationReason)), this, SLOT(handleSystemTray(QSystemTrayIcon::ActivationReason)));
+    m_trayIcon->show();
+}
+
+void ServerDialog::handleSystemTray(QSystemTrayIcon::ActivationReason reason)
+{
+    qDebug() << "activation";
+    switch (reason) {
+        case QSystemTrayIcon::Context :
+            qDebug() << "context";
+            m_trayIcon->contextMenu()->popup(QCursor::pos());
+            break;
+         default : 
+             qDebug() << "other";
+     }
 }
 
 #include "serverdialog.moc"

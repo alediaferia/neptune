@@ -63,13 +63,14 @@ void NeptuneServer::killServer()
 
 void NeptuneServer::removeLockFile()
 {
-    QFile locker(lockerPath);
+    QFile locker(m_lockerPath);
     locker.remove();
+    qDebug() << "removed " << m_lockerPath;
 }
 
 void NeptuneServer::setLockerPath(const QString &path)
 {
-    lockerPath = path;
+    m_lockerPath = path;
 }
 
 QIcon NeptuneServer::serverIcon()

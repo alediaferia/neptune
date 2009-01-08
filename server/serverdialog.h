@@ -21,6 +21,7 @@
 #define SERVERDIALOG_H
 
 #include <QDialog>
+#include <QSystemTrayIcon>
 #include "ui_server.h"
 #include "neptuneserver.h"
 
@@ -39,10 +40,15 @@ private:
     Ui::Server server;
     QTcpServer *m_tcpServer;
     NeptuneServer *m_server;
+    QSystemTrayIcon *m_trayIcon;
+
+protected:
+    void buildTray();
 
 protected slots:
     void makeServer();
     void incomingConnection();
+    void handleSystemTray(QSystemTrayIcon::ActivationReason);
 
 public slots:
     void setSuggestedAddress(const QString &);

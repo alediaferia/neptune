@@ -76,7 +76,7 @@ void ServerDialog::incomingConnection()
     server.textBrowser->append(tr("A new incoming connection estabilished with the server."), ConnectionInfoWidget::Normal);
 
     QTcpSocket *connection = m_tcpServer->nextPendingConnection();
-    QStandardItem *incoming = new QStandardItem(connection->localAddress().toString());
+    QStandardItem *incoming = new QStandardItem(connection->peerAddress().toString());
     m_model->appendRow(incoming);
 
     connection->write("Welcome!");

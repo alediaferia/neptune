@@ -26,12 +26,13 @@
 #include "neptuneserver.h"
 
 class QTcpServer;
+class QStandardItemModel;
 
 class ServerDialog : public QDialog
 {
     Q_OBJECT
 public:
-    ServerDialog(QWidget *parent = 0);
+    ServerDialog(NeptuneServer *nserver, QWidget *parent = 0);
     ~ServerDialog();
 
     void setServer(NeptuneServer *);
@@ -41,6 +42,7 @@ private:
     QTcpServer *m_tcpServer;
     NeptuneServer *m_server;
     QSystemTrayIcon *m_trayIcon;
+    QStandardItemModel *m_model;
 
 protected:
     void buildTray();
@@ -52,6 +54,7 @@ protected slots:
 
 public slots:
     void setSuggestedAddress(const QString &);
+    void disconnectServer();
 };
 
 #endif

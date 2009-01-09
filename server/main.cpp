@@ -34,11 +34,9 @@ int main(int argc, char *argv[])
     }
 
 
-    ServerDialog* dialog = new ServerDialog();
-    dialog->setServer(server);
-    dialog->exec();
+    ServerDialog dialog(server);
+    dialog.show();
 
-    app.exec();
-    return 0;
+    return app.exec();
 }
 

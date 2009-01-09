@@ -22,19 +22,28 @@
 
 #include <QDebug>
 
-#include <QCursor>
 #include <QMenu>
 #include <QAction>
+#include <QStandardItem>
+#include <QStandardItemModel>
+
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QTcpSocket>
 
-ServerDialog::ServerDialog(QWidget *parent) : QDialog(parent), m_tcpServer(0), m_trayIcon(0)
+ServerDialog::ServerDialog(NeptuneServer *nserver, QWidget *parent) : QDialog(parent), m_tcpServer(0), m_trayIcon(0), m_model(0)
 {
     server.setupUi(this);
     connect (server.okButton, SIGNAL(clicked()), this, SLOT(accept()));
-    connect (server.cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
     connect (server.listenButton, SIGNAL(clicked()), this, SLOT(makeServer()));
+
+    m_model = new QStandardItemModel(this);
+    server.listView->setModel(m_model);
+
+    setServer(nserver);
+    buildTray();
+
+    setWindowTitle(tr("Neptune Server"));
 }
 
 ServerDialog::~ServerDialog()
@@ -65,38 +74,51 @@ void ServerDialog::setSuggestedAddress(const QString &address)
 void ServerDialog::incomingConnection()
 {
     server.textBrowser->append(tr("A new incoming connection estabilished with the server."), ConnectionInfoWidget::Normal);
-    m_tcpServer->nextPendingConnection()->write("Welcome!");
+
+    QTcpSocket *connection = m_tcpServer->nextPendingConnection();
+    QStandardItem *incoming = new QStandardItem(connection->localAddress().toString());
+    m_model->appendRow(incoming);
+
+    connection->write("Welcome!");
 }
 
 void ServerDialog::setServer(NeptuneServer *server)
 {
     m_server = server;
-
-    buildTray();
 }
 
 void ServerDialog::buildTray()
 {
     QMenu *trayMenu = new QMenu(this);
+    QAction *server_disconnect = trayMenu->addAction(tr("Disconnect"));
     trayMenu->addSeparator();
     QAction *exitAction = trayMenu->addAction(tr("Exit"));
 
-    m_trayIcon = new QSystemTrayIcon(m_server->serverIcon(), this);
+    m_trayIcon = new QSystemTrayIcon(this);
     m_trayIcon->setContextMenu(trayMenu);
+    m_trayIcon->setIcon(m_server->serverIcon()); 
+
     connect (m_trayIcon, SIGNAL(activated( QSystemTrayIcon::ActivationReason)), this, SLOT(handleSystemTray(QSystemTrayIcon::ActivationReason)));
+    connect (exitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect (server_disconnect, SIGNAL(triggered()), this, SLOT(disconnectServer()));
+
     m_trayIcon->show();
+}
+
+void ServerDialog::disconnectServer()
+{
+    m_tcpServer->close();
+    m_model->clear();
+    server.textBrowser->append(tr("Server disconnected."), ConnectionInfoWidget::Bad);
 }
 
 void ServerDialog::handleSystemTray(QSystemTrayIcon::ActivationReason reason)
 {
-    qDebug() << "activation";
     switch (reason) {
-        case QSystemTrayIcon::Context :
-            qDebug() << "context";
-            m_trayIcon->contextMenu()->popup(QCursor::pos());
+        case QSystemTrayIcon::Trigger :
+            setVisible(!isVisible());
             break;
-         default : 
-             qDebug() << "other";
+         default : ;
      }
 }
 
